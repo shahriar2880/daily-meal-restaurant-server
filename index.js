@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const jwt = require('jsonwebtoken');
 require("dotenv").config();
 const port = process.env.PORT || 5050;
 
@@ -30,6 +31,8 @@ async function run() {
     const reviewCollection = client.db("resturent").collection("reviews");
     const cartCollection = client.db("resturent").collection("carts");
 
+
+    
     //user related api
     app.get('/users', async(req, res) =>{
       const result = await userCollection.find().toArray();
