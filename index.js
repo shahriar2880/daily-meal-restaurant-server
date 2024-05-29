@@ -40,7 +40,7 @@ async function run() {
 
     // middlewares 
     const verifyToken = (req, res, next) => {
-      console.log('inside verify token', req.headers.authorization);
+      // console.log('inside verify token', req.headers.authorization);
       if (!req.headers.authorization) {
         return res.status(401).send({ message: 'unauthorized access' });
       }
@@ -55,25 +55,26 @@ async function run() {
     }
 
     // users related api
-    app.get('/users', async (req, res) => {
+    app.get('/users', verifyToken, async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
 
     // is admin?
-    app.get('/user/admin/:email', verifyToken, async(req, res)=>{
+    app.get('/users/admin/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
-      if(email !== req.decode.email){
-        return res.status(403).send({message: 'unouthorized access'})
+
+      if (email !== req.decoded.email) {
+        return res.status(403).send({ message: 'forbidden access' })
       }
 
-      const query ={email:email};
+      const query = { email: email };
       const user = await userCollection.findOne(query);
       let admin = false;
-      if(user){
-        admin = user?.role === 'admin'
+      if (user) {
+        admin = user?.role === 'admin';
       }
-      res.send({admin});
+      res.send({ admin });
     })
 
     //user api
@@ -91,20 +92,20 @@ async function run() {
     });
 
     //change user role
-    app.patch("/users/admin/:id", async (req, res) => {
+    app.patch('/users/admin/:id', verifyToken, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updatedDoc = {
         $set: {
-          role: "admin",
-        },
-      };
+          role: 'admin'
+        }
+      }
       const result = await userCollection.updateOne(filter, updatedDoc);
       res.send(result);
-    });
+    })
 
     //delete user
-    app.delete("/users/:id", async (req, res) => {
+    app.delete("/users/:id",verifyToken, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await userCollection.deleteOne(query);
@@ -123,8 +124,8 @@ async function run() {
       res.send(result);
     });
 
-    //carts Collecction
-    app.get("/carts", async (req, res) => {
+    // carts collection
+    app.get('/carts', async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
       const result = await cartCollection.find(query).toArray();
@@ -132,16 +133,16 @@ async function run() {
     });
 
     // sent cart data to database
-    app.post("/carts", async (req, res) => {
+    app.post('/carts', async (req, res) => {
       const cartItem = req.body;
       const result = await cartCollection.insertOne(cartItem);
       res.send(result);
     });
 
     //delete from cart
-    app.delete("/carts/:id", async (req, res) => {
+    app.delete('/carts/:id', async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
+      const query = { _id: new ObjectId(id) }
       const result = await cartCollection.deleteOne(query);
       res.send(result);
     });
