@@ -67,13 +67,15 @@ async function run() {
 
     }
 
-    // users related api
+    //---------- users related api---------------------//
+
     app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
 
-    // is admin?
+    //----------------- is admin?-----------------------------//
+
     app.get('/users/admin/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
 
@@ -90,7 +92,8 @@ async function run() {
       res.send({ admin });
     })
 
-    //user api
+    //-------------------user api------------------//
+
     app.post('/users', async (req, res) => {
       const user = req.body;
       // insert email if user doesnt exists: 
@@ -104,7 +107,8 @@ async function run() {
       res.send(result);
     });
 
-    //change user role
+    //------------------change user role------------------//
+
     app.patch('/users/admin/:id', verifyToken,verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
@@ -117,7 +121,8 @@ async function run() {
       res.send(result);
     })
 
-    //delete user
+    //------------------delete user------------------//
+
     app.delete("/users/:id",verifyToken,verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -125,19 +130,30 @@ async function run() {
       res.send(result);
     });
 
-    //menu Collection
+    //------------------menu Collection------------------//
+
     app.get("/menu", async (req, res) => {
       const result = await menuCollection.find().toArray();
       res.send(result);
     });
 
-    //review Collection
+    //------------------set menu into database------------------//
+
+    app.post('/menu', verifyToken, verifyAdmin, async (req, res)=>{
+      const item = req.body;
+      const result = await menuCollection.insertOne(item)
+      res.send(result);
+    });
+
+    //------------------review Collection------------------//
+
     app.get("/reviews", async (req, res) => {
       const result = await reviewCollection.find().toArray();
       res.send(result);
     });
 
-    // carts collection
+    //------------------ carts collection ------------------//
+
     app.get('/carts', async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
@@ -145,14 +161,16 @@ async function run() {
       res.send(result);
     });
 
-    // sent cart data to database
+    //------------------sent cart data to database------------------//
+
     app.post('/carts', async (req, res) => {
       const cartItem = req.body;
       const result = await cartCollection.insertOne(cartItem);
       res.send(result);
     });
 
-    //delete from cart
+    //------------------delete from cart------------------//
+
     app.delete('/carts/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
@@ -160,12 +178,14 @@ async function run() {
       res.send(result);
     });
 
-    // Send a ping to confirm a successful connection
+    //------------------Send a ping to confirm a successful connection------------------//
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
   } finally {
+
     // Ensures that the client will close when you finish/error
     //await client.close();
   }
