@@ -152,7 +152,7 @@ async function run() {
       const query = { _id: new ObjectId(id) }
       const result = await menuCollection.deleteOne(query);
       res.send(result);
-    });
+    })
 
     //------------------review Collection------------------//
 
