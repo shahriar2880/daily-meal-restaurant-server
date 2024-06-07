@@ -55,16 +55,15 @@ async function run() {
     }
 
     //use verify admin after verifyToken
-    const verifyAdmin = async(req, res, next)=>{
+    const verifyAdmin = async (req, res, next) => {
       const email = req.decoded.email;
-      const query ={ email : email};
+      const query = { email: email };
       const user = await userCollection.findOne(query);
-      const isAdmin = user?.role === 'admin' ;
-      if(!isAdmin){
-        return res.status(403).send({message: 'forbidden access'})
+      const isAdmin = user?.role === 'admin';
+      if (!isAdmin) {
+        return res.status(403).send({ message: 'forbidden access' });
       }
       next();
-
     }
 
     //---------- users related api---------------------//
@@ -92,6 +91,7 @@ async function run() {
       res.send({ admin });
     })
 
+
     //-------------------user api------------------//
 
     app.post('/users', async (req, res) => {
@@ -109,7 +109,7 @@ async function run() {
 
     //------------------change user role------------------//
 
-    app.patch('/users/admin/:id', verifyToken,verifyAdmin, async (req, res) => {
+    app.patch('/users/admin/:id', verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updatedDoc = {
@@ -123,42 +123,42 @@ async function run() {
 
     //------------------delete user------------------//
 
-    app.delete("/users/:id",verifyToken,verifyAdmin, async (req, res) => {
+    app.delete('/users/:id', verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
+      const query = { _id: new ObjectId(id) }
       const result = await userCollection.deleteOne(query);
       res.send(result);
-    });
+    })
 
     //------------------menu Collection------------------//
 
-    app.get("/menu", async (req, res) => {
+    app.get('/menu', async (req, res) => {
       const result = await menuCollection.find().toArray();
       res.send(result);
     });
 
      //------------------get menu by id------------------//
-    app.get('/menu/:id', async (req, res) => {
+     app.get('/menu/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
-      const result = await menuCollection.deleteOne(query);
+      const result = await menuCollection.findOne(query);
       res.send(result);
     })
 
     //------------------set menu into database------------------//
 
-    app.post('/menu', verifyToken, verifyAdmin, async (req, res)=>{
+    app.post('/menu', verifyToken, verifyAdmin, async (req, res) => {
       const item = req.body;
-      const result = await menuCollection.insertOne(item)
+      const result = await menuCollection.insertOne(item);
       res.send(result);
     });
 
     //------------------update menu into database------------------//
 
-    app.patch('/menu/:id', verifyToken, verifyAdmin, async (req, res)=>{
+    app.patch('/menu/:id', async (req, res) => {
       const item = req.body;
-      const id =req.params.id;
-      const filter = { _id: new ObjectId(id) };
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
       const updatedDoc = {
         $set: {
           name: item.name,
@@ -168,9 +168,10 @@ async function run() {
           image: item.image
         }
       }
-      const result = await menuCollection.updateOne(filter, updatedDoc);
+
+      const result = await menuCollection.updateOne(filter, updatedDoc)
       res.send(result);
-    });
+    })
 
     //------------------delete from menu------------------//
 
@@ -183,10 +184,10 @@ async function run() {
 
     //------------------review Collection------------------//
 
-    app.get("/reviews", async (req, res) => {
+    app.get('/reviews', async (req, res) => {
       const result = await reviewCollection.find().toArray();
       res.send(result);
-    });
+    })
 
     //------------------ carts collection ------------------//
 
