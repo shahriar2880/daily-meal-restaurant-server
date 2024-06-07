@@ -164,7 +164,8 @@ async function run() {
           name: item.name,
           category: item.category,
           price: item.price,
-          recipe: item.recipe
+          recipe: item.recipe,
+          image: item.image
         }
       }
       const result = await menuCollection.updateOne(filter, updatedDoc);
