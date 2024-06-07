@@ -138,7 +138,7 @@ async function run() {
     });
 
      //------------------get menu by id------------------//
-    app.get('/menu/:id', verifyToken, verifyAdmin, async (req, res) => {
+    app.get('/menu/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
       const result = await menuCollection.deleteOne(query);
