@@ -153,6 +153,24 @@ async function run() {
       res.send(result);
     });
 
+    //------------------update menu into database------------------//
+
+    app.patch('/menu/:id', verifyToken, verifyAdmin, async (req, res)=>{
+      const item = req.body;
+      const id =req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          name: item.name,
+          category: item.category,
+          price: item.price,
+          recipe: item.recipe
+        }
+      }
+      const result = await menuCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    });
+
     //------------------delete from menu------------------//
 
     app.delete('/menu/:id', verifyToken, verifyAdmin, async (req, res) => {
